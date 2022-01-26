@@ -55,7 +55,7 @@ void findFirstAndLastEntry(std::vector<int32_t> *first_vector,
         right = binSearchRight(first_vector, second_vector->at(i));
 
         if (left == right) {
-            std::cout << 0;
+            std::cout << 0 << '\n';
         } else {
             std::cout << left + 1 << ' ' << right << '\n';
         }
