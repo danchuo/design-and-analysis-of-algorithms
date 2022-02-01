@@ -51,7 +51,7 @@ int main() {
     std::cin >> amount;
 
     if (amount == 0) {
-        std::cout << 0;
+        std::cout << '\n' << 0;
         return 0;
     }
 
