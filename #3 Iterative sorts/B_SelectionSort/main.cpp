@@ -50,6 +50,11 @@ int main() {
     int amount;
     std::cin >> amount;
 
+    if (amount == 0) {
+        std::cout << 0;
+        return 0;
+    }
+
     auto vector = fillVector(amount);
 
     int swaps = selectionSort(vector);
