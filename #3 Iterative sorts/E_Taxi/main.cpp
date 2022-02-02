@@ -4,80 +4,41 @@
 #include <sstream>
 
 // https://ru.stackoverflow.com/a/532827
-std::vector<std::string> split(const std::string &s, char key) {
+std::vector<int> *split(const std::string &s, char key) {
     std::stringstream ss(s);
     std::string item;
-    std::vector<std::string> tokens;
+    std::vector<int> *tokens = new std::vector<int>();
     while (std::getline(ss, item, key)) {
-        tokens.push_back(item);
+        tokens->push_back(std::stoi(item));
     }
     return tokens;
 }
 
 std::vector<int> *fillVector() {
-    std::vector<int> *vector = new std::vector<int>();
-
     std::string input_string;
 
     std::getline(std::cin, input_string);
 
-    int input_number;
-
     auto strings = split(input_string, ' ');
 
-    for (int i = 0; i < strings.size(); ++i) {
-        input_number = std::stoi(strings[i]);
-        vector->push_back(input_number);
-    }
-    return vector;
+    return strings;
 }
 
-void bubbleSort(std::vector<int> *vector) {
-    int last_changed_index;
-    int bound = vector->size() - 1;
-    int var_to_swap;
-
-    for (int index = 0; index < vector->size() - 1; ++index) {
-        last_changed_index = 0;
-
-        for (int j = 0; j < bound; ++j) {
-            if (vector->at(j) > vector->at(j + 1)) {
-                var_to_swap = vector->at(j);
-                vector->at(j) = vector->at(j + 1);
-                vector->at(j + 1) = var_to_swap;
-                last_changed_index = j;
+void bubbleSort(std::vector<int> *increasing_vector, std::vector<int> *decreasing_vector) {
+    for (int index = 0; index < increasing_vector->size() - 1; ++index) {
+        for (int inner_index = 0; inner_index < increasing_vector->size() - index - 1;
+             ++inner_index) {
+            if (increasing_vector->at(inner_index) > increasing_vector->at(inner_index + 1)) {
+                int temp_variable = increasing_vector->at(inner_index);
+                increasing_vector->at(inner_index) = increasing_vector->at(inner_index + 1);
+                increasing_vector->at(inner_index + 1) = temp_variable;
             }
-        }
 
-        if (last_changed_index == 0) {
-            return;
-        } else {
-            bound = last_changed_index;
-        }
-    }
-}
-
-void bubbleSortDecreasing(std::vector<int> *vector) {
-    int last_changed_index;
-    int bound = vector->size() - 1;
-    int var_to_swap;
-
-    for (int index = 0; index < vector->size() - 1; ++index) {
-        last_changed_index = 0;
-
-        for (int j = 0; j < bound; ++j) {
-            if (vector->at(j) < vector->at(j + 1)) {
-                var_to_swap = vector->at(j);
-                vector->at(j) = vector->at(j + 1);
-                vector->at(j + 1) = var_to_swap;
-                last_changed_index = j;
+            if (decreasing_vector->at(inner_index) < decreasing_vector->at(inner_index + 1)) {
+                int temp_variable = decreasing_vector->at(inner_index);
+                decreasing_vector->at(inner_index) = decreasing_vector->at(inner_index + 1);
+                decreasing_vector->at(inner_index + 1) = temp_variable;
             }
-        }
-
-        if (last_changed_index == 0) {
-            return;
-        } else {
-            bound = last_changed_index;
         }
     }
 }
@@ -98,8 +59,7 @@ int main() {
     auto distances = fillVector();
     auto prices = fillVector();
 
-    bubbleSort(distances);
-    bubbleSortDecreasing(prices);
+    bubbleSort(distances, prices);
 
     std::cout << calculateSum(distances, prices);
 
