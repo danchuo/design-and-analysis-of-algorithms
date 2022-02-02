@@ -9,7 +9,7 @@ int binSearchLeft(std::vector<int> *vector, int key, int start_index, int end_in
 
     while (left < right - 1) {
         middle = left + (right - left) / 2;
-        if (vector->at(middle) < key) {
+        if (vector->at(middle) <= key) {
             left = middle;
         } else {
             right = middle;
