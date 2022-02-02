@@ -32,12 +32,6 @@ std::vector<int> *fillVector() {
     return vector;
 }
 
-void printVector(std::vector<int> *vector) {
-    for (int i = 0; i < vector->size(); ++i) {
-        std::cout << vector->at(i) << ' ';
-    }
-}
-
 void bubbleSort(std::vector<int> *vector) {
     int last_changed_index;
     int bound = vector->size() - 1;
@@ -88,8 +82,8 @@ void bubbleSortDecreasing(std::vector<int> *vector) {
     }
 }
 
-int calculateSum(std::vector<int> *distances, std::vector<int> *prices) {
-    int sum = 0;
+int64_t calculateSum(std::vector<int> *distances, std::vector<int> *prices) {
+    int64_t sum = 0;
 
     for (int i = 0; i < distances->size(); ++i) {
         sum += distances->at(i) * prices->at(i);
