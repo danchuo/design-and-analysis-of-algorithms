@@ -84,7 +84,11 @@ public:
 
 private:
     void siftUp(int i) {
-        while (!(vector_->at(i) < vector_->at((i - 1) / 2))) {
+        if (i == 0) {
+            return;
+        }
+
+        while (vector_->at(i) < vector_->at((i - 1) / 2)) {
             std::swap(vector_->at(i), vector_->at((i - 1) / 2));
             i = (i - 1) / 2;
         }
