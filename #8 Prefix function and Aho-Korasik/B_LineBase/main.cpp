@@ -13,9 +13,10 @@ void printVector(std::vector<int> vector) {
 
 int countZeros(std::vector<int> z_vector) {
     int answer = 1;
+    auto max = std::max_element(z_vector.begin(), z_vector.end());
 
     for (int i = 1; i < static_cast<int>(z_vector.size()); ++i) {
-        if (z_vector[i] == 0) {
+        if (z_vector[i] != (*max)) {
             ++answer;
         } else {
             return answer;
