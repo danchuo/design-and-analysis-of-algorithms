@@ -4,12 +4,15 @@
 
 std::map<std::string, char> *fillCodesTable(int number_of_strings) {
     auto codes_table = new std::map<std::string, char>();
+    char input_symbol;
+    char colon_symbol;
     std::string input_string;
-    std::getline(std::cin, input_string);
 
     for (int i = 0; i < number_of_strings; ++i) {
-        std::getline(std::cin, input_string);
-        codes_table->operator[](input_string.substr(3)) = input_string[0];
+        std::cin >> input_symbol;
+        std::cin >> colon_symbol;
+        std::cin >> input_string;
+        codes_table->operator[](input_string) = input_symbol;
     }
 
     return codes_table;
@@ -36,14 +39,20 @@ std::string decodeString(const std::string &coded_string,
 int main() {
     std::ios_base::sync_with_stdio(false);
     std::cin.tie(nullptr);
-    int input_symbols;
-    int output_symbols;
-    std::cin >> input_symbols >> output_symbols;
+    int number_of_input_symbols;
+    int number_of_coded_symbols;
+    std::cin >> number_of_input_symbols;
+    std::cin >> number_of_coded_symbols;
 
-    auto codes_table = fillCodesTable(input_symbols);
+    auto codes_table = fillCodesTable(number_of_input_symbols);
 
     std::string coded_symbols;
-    std::getline(std::cin, coded_symbols);
+    coded_symbols.reserve(number_of_coded_symbols / 2);
+    char input_char;
+    for (int i = 0; i < number_of_coded_symbols; ++i) {
+        std::cin >> input_char;
+        coded_symbols += input_char;
+    }
 
     std::cout << decodeString(coded_symbols, codes_table);
 
