@@ -56,8 +56,14 @@ int main() {
     std::string input_line;
     std::getline(std::cin, input_line);
 
-    auto control_bits = calculateControlBits(&input_line);
-    fixMistake(&input_line, *control_bits);
+    std::string *control_bits;
+
+    control_bits = calculateControlBits(&input_line);
+    try {
+        fixMistake(&input_line, *control_bits);
+    } catch (...) {
+    }
+
     printStringWithoutControlBits(input_line);
 
     delete control_bits;
