@@ -29,14 +29,6 @@ int calculateMinimumNumberOfCrossing(const std::string &symbols) {
             previous_left_coast[index] = previous_right_coast[index] = index;
         }
 
-        if (left_coast[index - 1] == 0) {
-            left_coast[index] = 1;
-        }
-
-        if (right_coast[index - 1] == 1) {
-            right_coast[index] = 2;
-        }
-
         if (left_coast[index] + 1 < right_coast[index]) {
             right_coast[index] = left_coast[index] + 1;
         }
