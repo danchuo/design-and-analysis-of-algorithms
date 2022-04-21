@@ -1,17 +1,17 @@
 #include <iostream>
 #include <vector>
 
-std::vector<std::vector<int>> *createTable(int n, int m, int init_value) {
-    auto table = new std::vector<std::vector<int>>(n);
+std::vector<std::vector<int64_t>> *createTable(int n, int m, int init_value) {
+    auto table = new std::vector<std::vector<int64_t>>(n);
 
     for (int i = 0; i < n; ++i) {
-        table->at(i) = std::vector<int>(m, init_value);
+        table->at(i) = std::vector<int64_t>(m, init_value);
     }
 
     return table;
 }
 
-int calculateWaysRec(std::vector<std::vector<int>> *table, int i, int j) {
+int64_t calculateWaysRec(std::vector<std::vector<int64_t>> *table, int i, int j) {
     if (i > -1 && j > -1 && i < table->size() && j < table->at(0).size()) {
         if (table->at(i).at(j) != -1) {
             return table->at(i).at(j);
