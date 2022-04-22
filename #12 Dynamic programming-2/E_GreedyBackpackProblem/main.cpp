@@ -47,7 +47,7 @@ std::vector<std::tuple<int, int, double>> *createData(int amount) {
     for (int i = 0; i < amount; ++i) {
         std::cin >> input_data;
         std::get<1>(vector->at(i)) = input_data;
-        std::get<2>(vector->at(i)) = input_data / std::get<0>(vector->at(i));
+        std::get<2>(vector->at(i)) = static_cast<double>(input_data) / std::get<0>(vector->at(i));
     }
 
     return vector;
