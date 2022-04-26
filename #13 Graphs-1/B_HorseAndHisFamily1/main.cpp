@@ -45,8 +45,8 @@ void addLinks(std::vector<std::vector<int>> *table, int number_of_links) {
 
     for (int i = 0; i < number_of_links; ++i) {
         std::cin >> first >> second;
-        table->at(first).at(second) = 1;
-        table->at(second).at(first) = 1;
+        table->at(first).push_back(second);
+        table->at(second).push_back(first);
     }
 }
 
@@ -61,8 +61,8 @@ std::vector<int> *bfs(std::vector<std::vector<int>> *table, int start_position) 
     while (!q.empty()) {
         int v = q.front();
         q.pop();
-        for (int to = 0; to < table->at(v).size(); ++to) {
-            if (table->at(v).at(to) && !used[to]) {
+        for (auto to : table->at(v)) {
+            if (!used[to]) {
                 used[to] = true;
                 q.push(to);
                 distances->at(to) = distances->at(v) + 1;
@@ -107,7 +107,7 @@ int main() {
 
     std::cin >> number_of_relatives >> number_of_links;
 
-    auto table = createTable(number_of_relatives, number_of_relatives);
+    auto table = createTable(number_of_relatives, 0);
     auto map = fillMap(number_of_relatives);
 
     addLinks(table, number_of_links);
