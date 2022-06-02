@@ -1,6 +1,56 @@
 #include <iostream>
 #include <vector>
 #include <algorithm>
+#include <queue>
+
+bool bfs(std::vector<std::vector<int64_t>> *table, int s, int t, std::vector<int64_t> *parents) {
+    std::queue<int64_t> queue;
+    queue.push(s);
+    std::vector<bool> used(table->size());
+    used[s] = true;
+    parents->at(s) = -1;
+    while (!queue.empty()) {
+        int v = queue.front();
+        queue.pop();
+        for (int to = 0; to < table->at(v).size(); ++to) {
+            if (!used[to] && table->at(v).at(to) > 0) {
+                used[to] = true;
+                queue.push(to);
+                parents->at(to) = v;
+            }
+        }
+    }
+
+    return used.at(t);
+}
+
+int64_t edmondsKarpAlgorithm(std::vector<std::vector<int64_t>> *table, int64_t source, int64_t t) {
+    auto parents = new std::vector<int64_t>(table->size());
+    int64_t flow = 0;
+
+    while (bfs(table, source, t, parents)) {
+        int64_t f = INT64_MAX;
+        int64_t s = t;
+
+        while (s != source) {
+            f = std::min(f, table->at(parents->at(s)).at(s));
+            s = parents->at(s);
+        }
+
+        flow += f;
+
+        int64_t v = t;
+        while (v != source) {
+            int64_t u = parents->at(v);
+            table->at(u).at(v) -= f;
+            table->at(v).at(u) += f;
+            v = parents->at(v);
+        }
+    }
+
+    delete parents;
+    return flow;
+}
 
 std::vector<std::vector<int64_t>> *createTable(int n, int m) {
     auto table = new std::vector<std::vector<int64_t>>(n);
@@ -22,38 +72,6 @@ void fillTable(std::vector<std::vector<int64_t>> *table, int edges) {
         table->at(first_input_number - 1).at(second_input_number - 1) = third_input_number;
     }
 }
-int64_t findPath(std::vector<std::vector<int64_t>> *table, std::vector<bool> *vis, int64_t u,
-                 int64_t t, int64_t flow) {
-    if (u == t) {
-        return flow;
-    }
-    vis->at(u) = true;
-    for (int v = 0; v < vis->size(); ++v) {
-        if (!vis->at(v) && table->at(u).at(v) > 0) {
-            int64_t df = findPath(table, vis, v, t, std::min(flow, table->at(u).at(v)));
-            if (df > 0) {
-                table->at(u).at(v) -= df;
-                table->at(v).at(u) += df;
-                return df;
-            }
-        }
-    }
-
-    return 0;
-}
-
-int64_t maxFlow(std::vector<std::vector<int64_t>> *table, int64_t source, int64_t t) {
-    for (int64_t flow = 0;;) {
-        auto vis = new std::vector<bool>(table->size());
-        int64_t df = findPath(table, vis, source, t, INT64_MAX);
-        if (df == 0) {
-            delete vis;
-            return flow;
-        }
-        flow += df;
-        delete vis;
-    }
-}
 
 int main() {
     std::ios_base::sync_with_stdio(false);
@@ -67,7 +85,7 @@ int main() {
 
     fillTable(table, edges);
 
-    std::cout << maxFlow(table, 0, vertices - 1);
+    std::cout << edmondsKarpAlgorithm(table, 0, vertices - 1);
 
     delete table;
     return 0;
