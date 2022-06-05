@@ -27,14 +27,15 @@ struct PairHash {
     }
 };
 
-bool bfs(std::vector<std::vector<int64_t>> *table, int s, int t, std::vector<int64_t> *parents) {
+bool bfs(std::vector<std::vector<int64_t>> *table, int64_t s, int64_t t,
+         std::vector<int64_t> *parents) {
     std::queue<int64_t> queue;
     queue.push(s);
     std::vector<bool> used(table->size());
     used[s] = true;
     parents->at(s) = -1;
     while (!queue.empty()) {
-        int v = queue.front();
+        int64_t v = queue.front();
         queue.pop();
         for (size_t to = 0; to < table->at(v).size(); ++to) {
             if (!used[to] && table->at(v).at(to) > 0) {
@@ -50,6 +51,7 @@ bool bfs(std::vector<std::vector<int64_t>> *table, int s, int t, std::vector<int
 
 int64_t edmondsKarpAlgorithm(std::vector<std::vector<int64_t>> *table, int64_t source, int64_t t) {
     auto parents = new std::vector<int64_t>(table->size());
+    auto used = new std::vector<bool>(table->size());
     int64_t flow = 0;
 
     while (bfs(table, source, t, parents)) {
@@ -73,13 +75,14 @@ int64_t edmondsKarpAlgorithm(std::vector<std::vector<int64_t>> *table, int64_t s
     }
 
     delete parents;
+    delete used;
     return flow;
 }
 
-std::vector<std::vector<int64_t>> *createTable(int n, int m) {
+std::vector<std::vector<int64_t>> *createTable(int64_t n, int64_t m) {
     auto table = new std::vector<std::vector<int64_t>>(n);
 
-    for (int i = 0; i < n; ++i) {
+    for (int64_t i = 0; i < n; ++i) {
         table->at(i) = std::vector<int64_t>(m);
     }
 
@@ -96,8 +99,23 @@ void fillTable(
     }
 }
 
+void fillDoubleTable2(std::vector<std::vector<int64_t>> *table,
+                      std::vector<std::vector<int64_t>> *double_table) {
+    for (size_t i = 0; i < table->size(); ++i) {
+        for (size_t j = 0; j < table->size(); ++j) {
+            if (table->at(i).at(j) == 1) {
+                double_table->at(i * 2).at(j * 2 - 1) = 10;
+            }
+        }
+
+        if (i != 0 && (i + 1) != table->size()) {
+            double_table->at(2 * i - 1).at(2 * i) = 1;
+        }
+    }
+}
+
 std::unordered_map<std::pair<int64_t, int64_t>, int, PairHash> *encodeVertices(
-    int amount, int64_t *s, int64_t *t,
+    int64_t amount,
     std::vector<std::pair<std::pair<int64_t, int64_t>, std::pair<int64_t, int64_t>>> *coordinates) {
     auto unique_vertices = new std::unordered_map<std::pair<int64_t, int64_t>, int, PairHash>();
 
@@ -105,7 +123,7 @@ std::unordered_map<std::pair<int64_t, int64_t>, int, PairHash> *encodeVertices(
     int64_t second;
     int64_t third;
     int64_t fourth;
-    for (int pairs = 0; pairs < amount + 1; ++pairs) {
+    for (int64_t pairs = 0; pairs < amount + 1; ++pairs) {
         std::cin >> first >> second >> third >> fourth;
 
         if (pairs != amount) {
@@ -121,10 +139,34 @@ std::unordered_map<std::pair<int64_t, int64_t>, int, PairHash> *encodeVertices(
         }
 
         if (pairs == amount) {
-            int64_t ss = unique_vertices->at({first, second});
-            int64_t tt = unique_vertices->at({third, fourth});
-            (*s) = ss;
-            (*t) = tt;
+            int64_t s = unique_vertices->at({first, second});
+            int64_t t = unique_vertices->at({third, fourth});
+
+            std::pair<const std::pair<int64_t, int64_t>, int> *source;
+            std::pair<const std::pair<int64_t, int64_t>, int> *sink;
+
+            for (auto pair : (*unique_vertices)) {
+                if (pair.second == 0) {
+                    source = &pair;
+                }
+                if (pair.second == static_cast<int>(unique_vertices->size() - 1)) {
+                    sink = &pair;
+                }
+            }
+
+            if (s != 0) {
+                auto it = unique_vertices->find({first, second});
+                int temp = (*it).second;
+                (*it).second = (*source).second;
+                (*source).second = temp;
+            }
+
+            if (t != static_cast<int>(unique_vertices->size() - 1)) {
+                auto it = unique_vertices->find({third, fourth});
+                int temp = (*it).second;
+                (*it).second = (*sink).second;
+                (*sink).second = temp;
+            }
         }
     }
 
@@ -136,22 +178,27 @@ int main() {
     std::cin.tie(nullptr);
 
     int64_t edges;
-    int64_t s = 0;
-    int64_t t = 0;
     std::cin >> edges;
-    auto coordinates =
-        new std::vector<std::pair<std::pair<int64_t, int64_t>, std::pair<int64_t, int64_t>>>();
-    auto unique_vertices = encodeVertices(edges, &s, &t, coordinates);
-    int64_t vertices = unique_vertices->size();
+    try {
+        auto coordinates =
+            new std::vector<std::pair<std::pair<int64_t, int64_t>, std::pair<int64_t, int64_t>>>();
+        auto unique_vertices = encodeVertices(edges, coordinates);
+        int64_t vertices = unique_vertices->size();
 
-    auto table = createTable(vertices, vertices);
+        auto table = createTable(vertices, vertices);
 
-    fillTable(table, coordinates, unique_vertices);
+        fillTable(table, coordinates, unique_vertices);
+        delete coordinates;
+        delete unique_vertices;
+        //
+        auto double_table = createTable(vertices * 2 - 2, vertices * 2 - 2);
+        fillDoubleTable2(table, double_table);
+        delete table;
 
-    std::cout << edmondsKarpAlgorithm(table, 0, vertices - 1);
+        std::cout << edmondsKarpAlgorithm(double_table, 0, vertices * 2 - 3);
+        delete double_table;
+    } catch (...) {
+    }
 
-    delete unique_vertices;
-    delete coordinates;
-    delete table;
     return 0;
 }
