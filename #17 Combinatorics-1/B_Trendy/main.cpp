@@ -1,57 +1,71 @@
 #include <iostream>
 #include <string>
 #include <vector>
-#include <utility>
 #include "BigIntegerUtils2.h"
 
-void printVector(std::vector<int> *vector, int limit) {
-    for (int i = 0; i < limit; ++i) {
+void printVector(std::vector<int> *vector) {
+    for (int i = 0; i < vector->size(); ++i) {
         std::cout << vector->at(i) << ' ';
     }
 }
 
-void getNext(std::vector<int> *vector, int n, int m) {
-    int j;
-    int k;
-    int left;
-    int right;
-    do {
-        j = n - 2;
-        while (j != -1 && vector->at(j) >= vector->at(j + 1)) {
-            --j;
-        }
-        k = n - 1;
-        while (vector->at(j) >= vector->at(k)) {
-            --k;
-        }
+BigInteger factorial(int n) {
+    BigInteger answer = 1;
 
-        std::swap(vector->at(j), vector->at(k));
-        left = j + 1;
-        right = n - 1;
-        while (left < right) {
-            std::swap(vector->at(left++), vector->at(right--));
-        }
-    } while (j > m - 1);
+    for (int i = 2; i <= n; ++i) {
+        answer.multiply(answer, i);
+    }
+
+    return answer;
 }
 
-void getKPlan(BigInteger shirts, const BigInteger days, const BigInteger number_of_plan) {
-    auto current_plan = new std::vector<int>(shirts.toInt());
+BigInteger numberOfVariants(int n, int k) {
+    return factorial(n) / (factorial(n - k));
+}
 
-    for (size_t i = 0; i < current_plan->size(); ++i) {
-        current_plan->at(i) = i + 1;
+int getFirstNotUsed(int index, std::vector<bool> *used) {
+    int current_index = 0;
+    for (int i = 0; i < used->size(); ++i) {
+        if (!used->at(i)) {
+            if (current_index == index) {
+                used->at(i) = true;
+                return i;
+            } else {
+                ++current_index;
+            }
+        }
+    }
+    return 0;
+}
+
+void findKPlan(BigInteger n, BigInteger m, BigInteger k) {
+    auto used = new std::vector<bool>(n.toInt());
+    auto current_variant = new std::vector<int>();
+    BigInteger amount_of_variants = numberOfVariants(n.toInt(), m.toInt());
+    BigInteger current_index = 0;
+    BigInteger margin = 0;
+    BigInteger possible_transitions;
+    BigInteger next_element;
+
+    while (current_variant->size() < m.toInt()) {
+        possible_transitions = amount_of_variants / (n - current_index);
+
+        auto index = ((k - margin) / possible_transitions);
+
+        next_element = getFirstNotUsed(index.toInt(), used);
+
+        current_variant->push_back(next_element.toInt() + 1);
+
+        margin += index * possible_transitions;
+
+        amount_of_variants /= n - current_index;
+        ++current_index;
     }
 
-    BigInteger number_of_current_plan = 1;
+    printVector(current_variant);
 
-    while (number_of_current_plan < number_of_plan) {
-        getNext(current_plan, shirts.toInt(), days.toInt());
-
-        ++number_of_current_plan;
-    }
-
-    printVector(current_plan, days.toInt());
-
-    delete current_plan;
+    delete used;
+    delete current_variant;
 }
 
 int main() {
@@ -72,7 +86,7 @@ int main() {
     std::cin >> input;
     number_of_plan = stringToBigInteger(input);
 
-    getKPlan(shirts, days, number_of_plan);
+    findKPlan(shirts, days, number_of_plan - 1);
 
     return 0;
 }
