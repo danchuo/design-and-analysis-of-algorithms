@@ -1,55 +1,73 @@
 #include <iostream>
 #include <string>
 #include <vector>
-#include <utility>
+#include <algorithm>
 #include "BigIntegerUtils2.h"
 
 void printVector(std::vector<int> *vector) {
-    for (int i = 0; i < vector->size() - 1; ++i) {
+    for (size_t i = 0; i < vector->size() - 1; ++i) {
         std::cout << vector->at(i) << ' ';
     }
     std::cout << vector->at(vector->size() - 1);
 }
 
-void getNext(std::vector<int> *vector) {
-    int amount = vector->size() - 1;
+BigInteger factorial(int n) {
+    BigInteger answer = 1;
 
-    int i = amount;
-    while (i > 1 && (vector->at(i) < vector->at(i - 1))) {
-        --i;
+    for (int i = 2; i <= n; ++i) {
+        answer.multiply(answer, i);
     }
 
-    int j = amount;
-
-    while (vector->at(j) < vector->at(i - 1)) {
-        --j;
-    }
-
-    std::swap(vector->at(i - 1), vector->at(j));
-
-    int limit = (amount - i + 1) / 2 - 1;
-    for (int k = 0; k <= limit; ++k) {
-        std::swap(vector->at(i + k), vector->at(amount - k));
-    }
+    return answer;
 }
 
-void getKVariant(BigInteger days, BigInteger number_of_variant) {
-    auto current_plan = new std::vector<int>(days.toInt());
+BigInteger numberOfVariants(int n, int k) {
+    return factorial(n) / (factorial(n - k));
+}
 
-    for (size_t i = 0; i < current_plan->size(); ++i) {
-        current_plan->at(i) = i + 1;
+int ivanFunction(int index, std::vector<bool> *used) {
+    int current_index = 0;
+    for (int i = 0; i < used->size(); ++i) {
+        if (!used->at(i)) {
+            if (current_index == index) {
+                used->at(i) = true;
+                return i;
+            } else {
+                ++current_index;
+            }
+        }
+    }
+    return 0;
+}
+
+void ivanMethod(BigInteger n, BigInteger k) {
+    auto used = new std::vector<bool>(n.toInt());
+    auto current_variant = new std::vector<int>();
+    BigInteger amount_of_variants = numberOfVariants(n.toInt(), n.toInt());
+    BigInteger current_index = 0;
+    BigInteger margin = 0;
+    BigInteger possible_transitions;
+    BigInteger next_element;
+
+    while (current_variant->size() < n.toInt()) {
+        possible_transitions = amount_of_variants / (n - current_index);
+
+        auto index = ((k - margin) / possible_transitions);
+
+        next_element = ivanFunction(index.toInt(), used);
+
+        current_variant->push_back(next_element.toInt() + 1);
+
+        margin += index * possible_transitions;
+
+        amount_of_variants /= n - current_index;
+        ++current_index;
     }
 
-    BigInteger number_of_current_variant = 1;
+    printVector(current_variant);
 
-    while (number_of_current_variant < number_of_variant) {
-        getNext(current_plan);
-        ++number_of_current_variant;
-    }
-
-    printVector(current_plan);
-
-    delete current_plan;
+    delete used;
+    delete current_variant;
 }
 
 int main() {
@@ -66,7 +84,7 @@ int main() {
     std::cin >> input;
     number_of_variant = stringToBigInteger(input);
 
-    getKVariant(students, number_of_variant);
+    ivanMethod(students, number_of_variant - 1);
 
     return 0;
 }
