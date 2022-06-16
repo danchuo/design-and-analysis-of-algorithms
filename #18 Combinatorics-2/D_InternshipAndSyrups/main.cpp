@@ -23,6 +23,7 @@ std::vector<int> *toBase(BigInteger number, int base) {
         answer->push_back((number % base).toInt());
         ++i;
         number /= base;
+        --base;
     }
 
     return answer;
