@@ -47,5 +47,6 @@ int main() {
     auto answer = toBase(k - 1, n);
     printAnswer(answer, n);
     delete answer;
+
     return 0;
 }
