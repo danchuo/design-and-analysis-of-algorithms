@@ -36,7 +36,7 @@ int main() {
     int k;
 
     std::cin >> n >> m >> k;
-
+    // lll
     auto answer = toBase(k - 1, n);
 
     printAnswer(answer, m);
