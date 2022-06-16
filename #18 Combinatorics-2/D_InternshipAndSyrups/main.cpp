@@ -19,7 +19,7 @@ std::vector<int> *toBase(BigInteger number, int base) {
     auto answer = new std::vector<int>();
 
     int i = 0;
-    while (number != 0) {
+    while (!number.isZero()) {
         answer->push_back((number % base).toInt());
         ++i;
         number /= base;
